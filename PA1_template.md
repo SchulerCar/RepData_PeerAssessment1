@@ -212,14 +212,8 @@ This is accomplished by the following code:
 
 ```r
 activity <- tibble::add_column(activity,imputedSteps = 0)
-for (index in 1:nrow(activity)) {
-        if(is.na(activity$steps[index])) 
-                activity$imputedSteps[index] <- 
-                        round(dailyPattern$mean
-                              [  which(dailyPattern$interval == 
-                                               activity$interval[index])  ],0)
-        else activity$imputedSteps[index] <- activity$steps[index]
-}
+activity <- activity %>% group_by(interval) %>%  
+  mutate(imputedSteps = ifelse(is.na(steps),round(mean(steps,na.rm=TRUE),0),steps))
 str(activity$imputedSteps)
 ```
 

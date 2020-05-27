@@ -468,14 +468,8 @@ ggplot(dailyPattern, aes(x=time, y=mean))+
 <p>There are <strong>2304</strong> missing values (<em>NA</em>’s) in the <em>steps</em> variable.</p>
 <p>To fill in all of the missing values in the dataset, I will use the <strong>rounded daily mean pattern</strong> <em>dailyPattern</em> calculated above. The result is be stored in a new column <em>imputedSteps</em> of <em>activity</em>. This is accomplished by the following code:</p>
 <pre class="r"><code>activity &lt;- tibble::add_column(activity,imputedSteps = 0)
-for (index in 1:nrow(activity)) {
-        if(is.na(activity$steps[index])) 
-                activity$imputedSteps[index] &lt;- 
-                        round(dailyPattern$mean
-                              [  which(dailyPattern$interval == 
-                                               activity$interval[index])  ],0)
-        else activity$imputedSteps[index] &lt;- activity$steps[index]
-}
+activity &lt;- activity %&gt;% group_by(interval) %&gt;%  
+  mutate(imputedSteps = ifelse(is.na(steps),round(mean(steps,na.rm=TRUE),0),steps))
 str(activity$imputedSteps)</code></pre>
 <pre><code>##  num [1:17568] 2 0 0 0 0 2 1 1 0 1 ...</code></pre>
 <p>[Note: this fulfills part <em>6. Code to describe and show a strategy for imputing missing data</em>]</p>
